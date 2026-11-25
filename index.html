@@ -782,15 +782,54 @@
 
                 <div>
                     <div class="flex items-center justify-between gap-2 mb-1">
-                        <label class="block text-xs font-semibold text-slate-700">Isi / Payload Paket Aplikasi (Untuk Unduhan Pembeli) *</label>
-                        <button type="button" onclick="applyAutoPayloadTemplate(true)" class="px-2.5 py-1 bg-brand-50 hover:bg-brand-100 text-brand-700 text-[11px] font-bold rounded-lg transition-colors flex items-center gap-1">
-                            <i data-lucide="wand-2" class="w-3 h-3"></i>
-                            <span>Generate Otomatis</span>
+                        <label class="block text-xs font-semibold text-slate-700">Deskripsi Singkat & Lengkap *</label>
+                        <button type="button" onclick="applyAutoDescriptionTemplate(true)" class="px-2.5 py-1 bg-brand-50 hover:bg-brand-100 text-brand-700 text-[11px] font-bold rounded-lg transition-colors flex items-center gap-1">
+                            <i data-lucide="sparkles" class="w-3 h-3"></i>
+                            <span>Isi Otomatis Deskripsi</span>
                         </button>
                     </div>
-                    <textarea id="form-download-payload" rows="5" required placeholder="Masukkan konfigurasi, panduan aktivasi, atau bundle payload aplikasi..." class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-xs font-mono focus:border-brand-500 outline-none"></textarea>
-                    <p class="text-[11px] text-slate-400 mt-1">Otomatis terisi dari detail aplikasi saat membuat produk baru, atau klik <strong>Generate Otomatis</strong> kapan saja.</p>
+                    <textarea id="form-desc" rows="3" required placeholder="Otomatis tersusun dari nama, kategori, platform, dan fitur aplikasi..." class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-sm focus:border-brand-500 outline-none"></textarea>
+                    <p class="text-[11px] text-slate-400 mt-1">Otomatis terisi saat nama, kategori, versi, platform, atau fitur diubah (kecuali jika Anda mengedit manual).</p>
                 </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Daftar Fitur (Pisahkan dengan koma) *</label>
+                    <input type="text" id="form-features" required placeholder="Cetak struk Bluetooth, Laporan laba rugi otomatis, Multi-kasir" class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-sm focus:border-brand-500 outline-none">
+                </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-3">
+                        <h4 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                            <i data-lucide="file-code-2" class="w-4 h-4 text-brand-600"></i>
+                            Spesifikasi Katalog & Lisensi
+                        </h4>
+                        <div class="text-xs space-y-2 text-slate-600">
+                            <div class="flex justify-between py-1 border-b border-slate-200/60">
+                                <span class="text-slate-400">Jenis Rilis</span>
+                                <span id="detail-catalog-type" class="font-semibold text-slate-800">Paket Aplikasi Katalog</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-slate-200/60">
+                                <span class="text-slate-400">Tipe Lisensi</span>
+                                <span class="font-semibold text-slate-800">Lifetime (Sekali Bayar)</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-slate-200/60">
+                                <span class="text-slate-400">Ukuran Paket</span>
+                                <span class="font-semibold text-slate-800" id="detail-size">24.5 MB (ZIP / APK)</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-slate-200/60">
+                                <span class="text-slate-400">File Unduhan Katalog</span>
+                                <span class="font-semibold text-brand-700 font-mono text-[11px]" id="detail-package-file">paket-aplikasi.json</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-slate-200/60">
+                                <span class="text-slate-400">Dukungan Update</span>
+                                <span class="font-semibold text-emerald-600">Gratis Selamanya</span>
+                            </div>
+                            <div class="pt-1">
+                                <span class="text-slate-400 block mb-1">Changelog Terbaru:</span>
+                                <p id="detail-changelog" class="text-slate-700 bg-white p-2 rounded-lg border border-slate-200 font-mono text-[11px]">Optimalisasi performa & perbaikan bug minor.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
                 <div class="pt-3 border-t border-slate-200 flex justify-end gap-2">
                     <button type="button" onclick="closeModal('product-form-modal')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl">Batal</button>
@@ -1385,6 +1424,13 @@
             const product = products.find(p => p.id === productId);
             if (!product) return;
 
+            const catalogFocusByCategory = {
+                'Keuangan & Kasir': 'Modul Kasir, Rekap Kas & Pelaporan Keuangan',
+                'Trading & Saham': 'Analisis Sinyal, Screener & Manajemen Risiko',
+                'Bisnis & Stok': 'Kontrol Inventori, Nota & Operasional Bisnis',
+                'Utilitas': 'Otomatisasi Alur Kerja & Integrasi Sistem'
+            };
+
             document.getElementById('detail-category-badge').textContent = product.category;
             document.getElementById('detail-version-badge').textContent = product.version;
             document.getElementById('detail-title').textContent = product.name;
@@ -1392,18 +1438,11 @@
             document.getElementById('detail-reviews').textContent = `(${product.reviews} ulasan terverifikasi)`;
             document.getElementById('detail-desc').textContent = product.desc;
             document.getElementById('detail-price').textContent = formatRupiah(product.price);
+            document.getElementById('detail-catalog-type').textContent = catalogFocusByCategory[product.category] || 'Aplikasi Katalog Siap Pakai';
             document.getElementById('detail-size').textContent = product.size || '25.0 MB (Paket Lengkap)';
+            document.getElementById('detail-package-file').textContent = product.downloadFilename || `${product.id}_Paket.json`;
             document.getElementById('detail-changelog').textContent = product.changelog || `${product.version} - Peningkatan stabilitas sistem & pembaruan keamanan.`;
-            document.getElementById('detail-preview-url').textContent = `demo.katalogapp.id/${product.id}`;
-
-            const iconBox = document.getElementById('detail-icon-box');
-            iconBox.className = `w-20 h-20 rounded-2xl bg-gradient-to-br ${product.color || 'from-brand-600 to-blue-600'} flex items-center justify-center text-white shrink-0 shadow-md`;
-            iconBox.innerHTML = `<i data-lucide="${product.icon || 'app-window'}" class="w-10 h-10"></i>`;
-
-            document.getElementById('detail-platforms').innerHTML = product.platforms.map(pl => `
-                <span class="px-2.5 py-0.5 text-xs font-semibold rounded-md border ${getPlatformBadgeClass(pl)}">${pl}</span>
-            `).join('');
-
+            document.getElementById('detail-preview-url').textContent = `katalog.app/${product.id}/${product.version.toLowerCase()}`;
             document.getElementById('detail-features').innerHTML = product.features.map(feat => `
                 <li class="flex items-start gap-2">
                     <i data-lucide="check" class="w-4 h-4 text-emerald-500 shrink-0 mt-0.5"></i>
@@ -2196,14 +2235,55 @@
             } else {
                 document.getElementById('product-form-title').textContent = 'Tambah Aplikasi Baru';
                 document.getElementById('form-product-id').value = '';
+                document.getElementById('form-desc').dataset.manualEdited = '';
+                document.getElementById('form-download-filename').dataset.manualEdited = '';
+                document.getElementById('form-download-payload').dataset.manualEdited = '';
                 document.querySelectorAll('input[name="form-platforms"]').forEach(cb => {
                     cb.checked = cb.value === 'Web App';
                 });
+                applyAutoDescriptionTemplate(true);
                 applyAutoPayloadTemplate(true);
             }
 
             openModal('product-form-modal');
             lucide.createIcons();
+        }
+
+        function buildAutoCatalogDescription() {
+            const name = document.getElementById('form-name').value.trim() || 'Aplikasi Katalog';
+            const category = document.getElementById('form-category').value || 'Utilitas';
+            const version = document.getElementById('form-version').value.trim() || 'v1.0';
+            const platforms = Array.from(document.querySelectorAll('input[name="form-platforms"]:checked')).map(cb => cb.value);
+            const platformText = platforms.length > 0 ? platforms.join(', ') : 'Web App';
+            const features = document.getElementById('form-features').value
+                .split(',')
+                .map(f => f.trim())
+                .filter(Boolean);
+
+            const focusMap = {
+                'Keuangan & Kasir': 'pencatatan transaksi, kas harian, dan rekap laporan keuangan',
+                'Trading & Saham': 'pemantauan indikator teknikal, penyaringan peluang, dan kalkulasi risiko',
+                'Bisnis & Stok': 'pengelolaan stok barang, pencatatan nota/retur, dan alur operasional usaha',
+                'Utilitas': 'otomatisasi tugas harian, integrasi notifikasi, dan efisiensi kerja'
+            };
+            const focusDesc = focusMap[category] || 'kebutuhan operasional aplikasi digital';
+            const featureSnippet = features.length > 0
+                ? ` Dilengkapi fitur utama: ${features.slice(0, 3).join(', ')}.`
+                : ' Dirancang siap pakai dengan lisensi lifetime dan dokumentasi aktivasi.';
+
+            return `${name} (${version}) adalah aplikasi pada kategori ${category} untuk platform ${platformText} yang berfokus pada ${focusDesc}.${featureSnippet}`;
+        }
+
+        function applyAutoDescriptionTemplate(force = false) {
+            const isEditing = Boolean(document.getElementById('form-product-id').value);
+            if (isEditing && !force) return;
+
+            const descInput = document.getElementById('form-desc');
+            if (!descInput) return;
+
+            if (force || !descInput.dataset.manualEdited) {
+                descInput.value = buildAutoCatalogDescription();
+            }
         }
 
         function buildAutoPackageBundle() {
@@ -2409,10 +2489,16 @@
 
         // Inisialisasi Halaman Saat Pertama Dimuat
         window.addEventListener('DOMContentLoaded', () => {
+            const descInput = document.getElementById('form-desc');
             const filenameInput = document.getElementById('form-download-filename');
             const payloadInput = document.getElementById('form-download-payload');
-            const autoTriggerIds = ['form-name', 'form-category', 'form-version', 'form-price', 'form-desc', 'form-features'];
+            const autoTriggerIds = ['form-name', 'form-category', 'form-version', 'form-price', 'form-features'];
 
+            if (descInput) {
+                descInput.addEventListener('input', () => {
+                    descInput.dataset.manualEdited = descInput.value.trim() ? 'true' : '';
+                });
+            }
             if (filenameInput) {
                 filenameInput.addEventListener('input', () => {
                     filenameInput.dataset.manualEdited = filenameInput.value.trim() ? 'true' : '';
@@ -2426,12 +2512,21 @@
             autoTriggerIds.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
-                    el.addEventListener('input', () => applyAutoPayloadTemplate(false));
-                    el.addEventListener('change', () => applyAutoPayloadTemplate(false));
+                    el.addEventListener('input', () => {
+                        applyAutoDescriptionTemplate(false);
+                        applyAutoPayloadTemplate(false);
+                    });
+                    el.addEventListener('change', () => {
+                        applyAutoDescriptionTemplate(false);
+                        applyAutoPayloadTemplate(false);
+                    });
                 }
             });
             document.querySelectorAll('input[name="form-platforms"]').forEach(cb => {
-                cb.addEventListener('change', () => applyAutoPayloadTemplate(false));
+                cb.addEventListener('change', () => {
+                    applyAutoDescriptionTemplate(false);
+                    applyAutoPayloadTemplate(false);
+                });
             });
 
             applyStoreBranding();
