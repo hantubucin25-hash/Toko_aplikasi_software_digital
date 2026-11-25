@@ -1,0 +1,16 @@
+{
+  "storeName": "VEGA-STORY",
+  "tagline": "Digital Software & Source Code",
+  "adminPassword": "230393",
+  "paymentMethods": [
+    {
+      "id": "pay-1795615671588",
+      "label": "DANA",
+      "description": "089631157242",
+      "badge": "POPULER",
+      "icon": "wallet",
+      "enabled": true
+    }
+  ],
+  "products": []
+}
