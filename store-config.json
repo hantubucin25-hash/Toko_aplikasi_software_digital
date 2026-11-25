@@ -1,0 +1,16 @@
+{
+  "storeName": "VEGA-STORY",
+  "tagline": "Digital Software & Source Code",
+  "adminPassword": "230393",
+  "paymentMethods": [
+    {
+      "id": "pay-qris",
+      "label": "QRIS Instan",
+      "description": "Otomatis terverifikasi dalam 1 detik",
+      "badge": "POPULER",
+      "icon": "qr-code",
+      "enabled": true
+    }
+  ],
+  "products": []
+}
