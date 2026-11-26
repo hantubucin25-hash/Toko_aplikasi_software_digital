@@ -1455,6 +1455,51 @@
                         safeStorageSet('katalogapp_orders', JSON.stringify(allOrders));
                         updateBadges();
                         if (!document.getElementById('orders-modal').classList.contains('hidden')) {
+                            function payOrderFromHistory(orderId) {
+    const idx = allOrders.findIndex(o => o.orderId === orderId);
+    if (idx === -1) {
+        showToast('Pesanan tidak ditemukan.', 'error');
+        return;
+    }
+
+    const targetOrder = allOrders[idx];
+    if (targetOrder.status === 'LUNAS') {
+        showToast(`Pesanan #${orderId} sudah berstatus LUNAS.`, 'info');
+        renderOrdersList();
+        return;
+    }
+
+    const updatedOrder = {
+        ...targetOrder,
+        status: 'LUNAS',
+        paidAt: new Date().toLocaleString('id-ID', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        }),
+        items: (targetOrder.items || []).map(item => ({
+            ...item,
+            paid: true,
+            licenseKey: item.licenseKey || generateLicenseKey(item.id)
+        }))
+    };
+
+    allOrders[idx] = updatedOrder;
+    if (!myOrderIds.includes(orderId)) {
+        myOrderIds.unshift(orderId);
+    }
+
+    resetHistoryDeleteConfirmations();
+    saveState({ syncSettings: false, syncProducts: false, syncOrders: true });
+    renderOrdersList();
+    if (isAdminAuthenticated && isAdminMode) {
+        renderAdminDashboard();
+    }
+    showSuccessModal(updatedOrder);
+    showToast(`Pembayaran pesanan #${orderId} berhasil! Lisensi & file unduhan kini terbuka.`);
+}
                             renderOrdersList();
                         }
                         if (isAdminAuthenticated && isAdminMode) {
@@ -2490,7 +2535,16 @@
                                 <span class="text-slate-500">${order.date}</span>
                             </div>
                             <div class="flex items-center gap-2.5">
-                                ${isOrderPaid
+                                ${${isOrderPaid
+    ? `<span class="font-bold text-emerald-600">Lunas (${formatRupiah(order.totalPaid)})</span>`
+    : `
+        <span class="font-bold text-amber-700 flex items-center gap-1"><i data-lucide="lock" class="w-3.5 h-3.5"></i> Belum Lunas (${formatRupiah(order.totalPaid)})</span>
+        <button type="button" onclick="payOrderFromHistory('${order.orderId}')" class="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold transition-colors flex items-center gap-1 shadow-sm">
+            <i data-lucide="credit-card" class="w-3 h-3"></i>
+            <span>Bayar Sekarang</span>
+        </button>
+    `
+}
                                     ? `<span class="font-bold text-emerald-600">Lunas (${formatRupiah(order.totalPaid)})</span>`
                                     : `<span class="font-bold text-amber-700 flex items-center gap-1"><i data-lucide="lock" class="w-3.5 h-3.5"></i> Belum Lunas — Menunggu Verifikasi Admin (${formatRupiah(order.totalPaid)})</span>`
                                 }
